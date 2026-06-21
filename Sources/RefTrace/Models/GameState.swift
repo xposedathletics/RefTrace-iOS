@@ -1,35 +1,34 @@
 import Foundation
-import Combine
 
-class GameState: ObservableObject {
-    @Published var homeTeam: String = "Home"
-    @Published var awayTeam: String = "Away"
-    @Published var homeScore: Int = 0
-    @Published var awayScore: Int = 0
-    @Published var period: Int = 1
-    @Published var clockRunning: Bool = false
-    @Published var clockSeconds: Int = 720
-    @Published var penalties: [Penalty] = []
-    @Published var sessionCode: String = ""
-    @Published var userRole: String = "head"
-
-    func incrementHome() { homeScore += 1 }
-    func incrementAway() { awayScore += 1 }
-    func decrementHome() { if homeScore > 0 { homeScore -= 1 } }
-    func decrementAway() { if awayScore > 0 { awayScore -= 1 } }
-    func nextPeriod() { period += 1 }
-
-    func resetClock(minutes: Int) {
-        clockSeconds = minutes * 60
-        clockRunning = false
-    }
+struct ScoreEvent: Identifiable, Codable {
+    let id = UUID()
+    let side: String
+    let type: String
+    let pts: Int
+    let periodLabel: String
+    let clock: String
+    let wall: String
+    let ts: Date
 }
 
-struct Penalty: Identifiable {
-    var id = UUID()
-    var type: String
-    var team: String
-    var playerNumber: String
-    var period: Int
-    var timestamp: Date = Date()
+struct FlagEvent: Identifiable, Codable {
+    let id = UUID()
+    let code: String
+    let label: String
+    let side: String
+    let team: String
+    let teamName: String
+    let mascot: String
+    let playerNum: String
+    let periodLabel: String
+    let clock: String
+    let wall: String
+    let ts: Date
+}
+
+struct GamePeriod: Identifiable, Codable {
+    let id = UUID()
+    let label: String
+    let maxSecs: Int
+    var scores: [ScoreEvent] = []
 }
