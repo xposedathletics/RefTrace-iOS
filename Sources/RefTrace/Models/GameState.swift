@@ -112,13 +112,14 @@ class GameState: ObservableObject {
         periodIdx = 0
         clock     = secs
         otCount   = 0
-    }
-
+    
     func addOT() {
-        otCount += 1
-        [periods.app](https://periods.app)end(GamePeriod(label:"OT\(otCount)", maxSecs:10*60))
-        periodIdx = periods.count - 1
-        clock     = 10 * 60
-        running   = false
-    }
+    otCount += 1
+    let newPeriod = GamePeriod(label: "OT\(otCount)", maxSecs: 10 * 60)
+    [periods.app](https://periods.app)end(newPeriod)
+    periodIdx = periods.count - 1
+    clock = 10 * 60
+    running = false
 }
+
+    
