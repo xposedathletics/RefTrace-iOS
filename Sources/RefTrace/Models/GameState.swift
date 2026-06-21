@@ -105,14 +105,14 @@ class GameState: ObservableObject {
     var away: String       { awayTeam.isEmpty ? "Away" : awayTeam }
 
     func resetForSport() {
-        let count  = sport == "Football" ? 4 : 2
-        let prefix = sport == "Football" ? "Q" : "H"
-        let secs   = sport == "Football" ? 48*60 : 20*60
-        periods   = (1...count).map { GamePeriod(label:"\(prefix)\($0)", maxSecs:secs) }
-        periodIdx = 0
-        clock     = secs
-        otCount   = 0
-    
+    let count  = sport == "Football" ? 4 : 2
+    let prefix = sport == "Football" ? "Q" : "H"
+    let secs   = sport == "Football" ? 48 * 60 : 20 * 60
+    periods   = (1...count).map { GamePeriod(label: "\(prefix)\($0)", maxSecs: secs) }
+    periodIdx = 0
+    clock     = secs
+    otCount   = 0
+}   
     func addOT() {
     otCount += 1
     let newPeriod = GamePeriod(label: "OT\(otCount)", maxSecs: 10 * 60)
