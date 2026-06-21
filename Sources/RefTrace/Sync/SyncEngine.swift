@@ -1,55 +1,27 @@
 import Foundation
 import Combine
-
-public class SyncEngine: ObservableObject {
-    
-    public static let shared = SyncEngine()
-    
-    @Published public var isConnected: Bool = false
-    @Published public var lastSyncTime: Date? = nil
-    @Published public var sessionCode: String = ""
-    
-    private var timer: Timer?
-    private var cancellables = Set<AnyCancellable>()
-    
-    public init() {
-        setupSync()
+ 
+// ── Sync engine -- bridges game state to other devices via localStorage polling
+// In production: replace with URLSession WebSocket or Supabase Realtime
+class SyncEngine: ObservableObject {
+    @Published var connected: Bool = false
+    let flagPublisher = PassthroughSubject<FlagEvent,Never>()
+ 
+    func connect(sessionCode:String) {
+        connected = true
+        // TODO: Open WebSocket to wss://your-server.com/reftrace/\(sessionCode)
+        // On message: decode JSON → update GameState fields
+        // For local same-device testing: poll UserDefaults every 500ms
     }
-    
-    private func setupSync() {
-        isConnected = true
-    }
-    
-    public func startSession(code: String) {
-        sessionCode = code
-        isConnected = true
-        lastSyncTime = Date()
-        startPolling()
-    }
-    
-    public func stopSession() {
-        isConnected = false
-        stopPolling()
-        sessionCode = ""
-    }
-    
-    public func syncNow() {
-        lastSyncTime = Date()
-    }
-    
-    private func startPolling() {
-        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
-            self.syncNow()
+ 
+    func disconnect() { connected = false }
+ 
+    // Called by Head Ref after commitFlag
+    func broadcastFlag(_ flag: FlagEvent) {
+        // Encode flag to JSON and send via WebSocket or UserDefaults
+        if let data = try? JSONEncoder().encode(flag) {
+            UserDefaults.standard.set(data, forKey:"reftrace_penalty_flag")
         }
-    }
-    
-    private func stopPolling() {
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    public func generateSessionCode() -> String {
-        let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return String((0..<6).map { _ in letters.randomElement()! })
+        flagPublisher.send(flag)
     }
 }
